@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${visitedUser.fullname} + ' - Profil'">Profil</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body style="padding-top: 80px;">
+
+    <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/home"><i class="fas fa-graduation-cap"></i> UniVerse</a>
+            <a href="/home" class="btn btn-sm btn-outline-primary rounded-pill"><i class="fas fa-arrow-left"></i> Akışa Dön</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <div class="glass-card text-center mb-4 position-relative overflow-hidden">
+                    
+                    <div class="position-absolute top-0 end-0 m-3 z-3 dropdown">
+                        <button class="btn btn-light btn-sm rounded-circle shadow-sm" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                            <li><a class="dropdown-item" href="#" onclick="alert('Profil linki kopyalandı!')"><i class="fas fa-link me-2"></i> Paylaş</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="alert('Kullanıcı şikayet edildi!')"><i class="fas fa-flag me-2"></i> Şikayet Et</a></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="alert('Kullanıcı engellendi!')"><i class="fas fa-ban me-2"></i> Engelle</a></li>
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(45deg, #c3cfe2, #c7d2fe); height: 120px; position: absolute; top:0; left:0; right:0;"></div>
+                    
+                    <div class="position-relative mx-auto mt-5" style="width: 120px;">
+                        <img th:src="@{${visitedUser.getAvatarPath()}}" class="rounded-circle border border-4 border-white shadow" width="120" height="120" style="object-fit: cover; background: white;">
+                        
+                        <span th:if="${visitedUser.isOnline()}" class="position-absolute bottom-0 end-0 p-2 bg-success border border-4 border-white rounded-circle" style="transform: translate(-15%, -15%); width: 25px; height: 25px;"></span>
+                    </div>
+
+                    <h3 class="mt-3 fw-bold mb-0">
+                        <span th:text="${visitedUser.fullname}">İsim</span>
+                        <i th:if="${visitedUser.isVerified}" class="fas fa-check-circle text-primary ms-1"></i>
+                        <span th:if="${visitedUser.isVip()}" class="badge bg-warning text-dark ms-1" style="font-size: 0.6rem; vertical-align: middle;">VIP</span>
+                    </h3>
+                    
+                    <small class="text-muted fw-bold" th:text="${visitedUser.getLastSeenText()}">Çevrimiçi</small>
+
+                    <p class="text-primary fw-bold mb-2 mt-2" th:text="${visitedUser.department != null ? visitedUser.department : 'Bölüm Yok'}"></p>
+                    <p class="text-muted mb-3 px-5" th:text="${visitedUser.bio != null ? visitedUser.bio : 'Hakkında bilgisi yok.'}"></p>
+
+                    <div th:if="${visitedUser.profileMusic != null}" class="mb-4 px-4 d-flex justify-content-center">
+                        <audio controls class="w-100" style="max-width: 400px; height: 40px; border-radius: 20px;"><source th:src="@{${visitedUser.getMusicPath()}}" type="audio/mpeg"></audio>
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-3 mb-3">
+                        <div th:if="${currentUser.id != visitedUser.id}">
+                            <a th:unless="${isFollowing}" th:href="@{'/user/follow/' + ${visitedUser.id}}" class="btn btn-primary-modern px-4"><i class="fas fa-user-plus me-2"></i> Takip Et</a>
+                            <a th:if="${isFollowing}" th:href="@{'/user/follow/' + ${visitedUser.id}}" class="btn btn-danger px-4 rounded-pill"><i class="fas fa-user-minus me-2"></i> Takibi Bırak</a>
+                            <a th:href="@{'/chat/dm/' + ${visitedUser.id}}" class="btn btn-outline-secondary rounded-pill px-4"><i class="fas fa-envelope me-2"></i> Mesaj</a>
+                        </div>
+                        <div th:if="${currentUser.id == visitedUser.id}">
+                            <a href="/profile" class="btn btn-light rounded-pill border px-4">Profili Düzenle</a>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4 border-top pt-3">
+                        <div class="col-4"><h4 class="fw-bold mb-0" th:text="${#lists.size(posts)}">0</h4><small class="text-muted">Gönderi</small></div>
+                        <div class="col-4 border-start border-end"><h4 class="fw-bold mb-0" th:text="${visitedUser.getFollowersCount()}">0</h4><small class="text-muted">Takipçi</small></div>
+                        <div class="col-4"><h4 class="fw-bold mb-0" th:text="${visitedUser.getFollowingCount()}">0</h4><small class="text-muted">Takip</small></div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold text-muted mb-3 ps-2">Paylaşımlar</h5>
+                <div th:if="${#lists.isEmpty(posts)}" class="text-center py-5 text-muted glass-card"><i class="fas fa-ghost fa-3x mb-3 opacity-25"></i><p>Henüz hiçbir şey paylaşmamış.</p></div>
+
+                <div th:each="post : ${posts}" class="card glass-card mb-4 border-0 shadow-sm post-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <img th:src="@{${visitedUser.getAvatarPath()}}" class="rounded-circle border me-3" width="45" height="45" style="object-fit: cover;">
+                                <div><h6 class="mb-0 fw-bold"><span th:text="${post.authorName}"></span> <span class="badge bg-light text-secondary fw-normal ms-2 border" th:text="${post.category}"></span></h6><small class="text-muted" th:text="${post.timeAgo}"></small></div>
+                            </div>
+                            <a th:href="@{'/post/save/' + ${post.id}}" class="btn btn-link text-muted p-0"><i th:class="${currentUser.savedPosts.contains(post)} ? 'fas fa-bookmark text-primary' : 'far fa-bookmark'"></i></a>
+                        </div>
+                        <p class="card-text mb-3" th:text="${post.content}"></p>
+                        <div th:if="${post.imageUrl != null}" class="mb-3"><img th:src="@{${post.photosImagePath}}" class="img-fluid rounded-4 shadow-sm" style="width: 100%; max-height: 400px; object-fit: cover;"></div>
+                        <div class="d-flex gap-4 border-top pt-3 align-items-center"><span class="text-danger"><i class="fas fa-heart me-1"></i> <span th:text="${post.likeCount}"></span></span><span class="text-muted"><i class="far fa-comment me-1"></i> <span th:text="${#lists.size(post.comments)}"></span></span></div>
+                    </div>
+                </div>
+
+             </div>
+        </div>
+    </div>
+    
+    <script th:inline="javascript">(function(){let s=localStorage.getItem('theme')||'light';const v=[[${currentUser.isVip}]];if(s==='gold'&&!v){s='light';localStorage.setItem('theme','light')}document.documentElement.setAttribute('data-theme',s)})();</script>
+</body>
+</html>

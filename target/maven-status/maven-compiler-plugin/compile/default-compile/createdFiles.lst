@@ -1,0 +1,10 @@
+com\universe\model\User.class
+com\universe\repository\CommentRepository.class
+com\universe\config\WebConfig.class
+com\universe\repository\UserRepository.class
+com\universe\model\Message.class
+com\universe\util\FileUploadUtil.class
+com\universe\model\Post.class
+com\universe\repository\MessageRepository.class
+com\universe\model\Comment.class
+com\universe\UniVerseApplication.class

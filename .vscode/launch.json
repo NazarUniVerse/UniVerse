@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-UniVerseApplication<UniVerse>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.universe.UniVerseApplication",
+            "projectName": "UniVerse",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

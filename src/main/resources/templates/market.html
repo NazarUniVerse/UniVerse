@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Uni-Pazar - UniVerse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .product-card { transition: all 0.3s; overflow: hidden; border: none; }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-img { height: 200px; object-fit: cover; width: 100%; border-top-left-radius: 20px; border-top-right-radius: 20px; }
+        
+        .vip-product {
+            border: 2px solid #FFD700 !important;
+            position: relative;
+            background: linear-gradient(180deg, rgba(255, 215, 0, 0.05) 0%, transparent 100%);
+        }
+        .vip-badge {
+            position: absolute; top: 10px; right: 10px;
+            background: #FFD700; color: #000; font-weight: bold;
+            padding: 5px 12px; border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .price-tag {
+            font-size: 1.2rem; font-weight: bold; color: var(--primary-color);
+        }
+    </style>
+</head>
+<body style="padding-top: 80px;">
+
+    <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/home"><i class="fas fa-graduation-cap"></i> UniVerse</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/home"><i class="fas fa-home me-1"></i> Akış</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/notes"><i class="fas fa-book me-1"></i> Notlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/events"><i class="fas fa-calendar-alt me-1"></i> Etkinlikler</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold" href="/market"><i class="fas fa-store me-1"></i> Pazar</a></li>
+                    
+                    <li class="nav-item mx-2">
+                        <a class="nav-link position-relative" href="/notifications"><i class="fas fa-bell fa-lg"></i>
+                            <span th:if="${unreadCount > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light" style="font-size: 0.6rem;"><span th:text="${unreadCount}">0</span></span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown ms-3">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img th:src="@{${user.avatarPath}}" class="rounded-circle border border-2 shadow-sm" width="45" height="45" style="object-fit: cover; border-color: var(--primary-color) !important;">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-3 p-2" style="min-width: 220px;">
+                            <li><h6 class="dropdown-header fw-bold text-primary" th:text="${user.fullname}">Kullanıcı</h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li th:if="${user.email == 'admin@universe.edu.tr'}"><a class="dropdown-item rounded text-danger fw-bold bg-light mb-2" href="/admin/messages"><i class="fas fa-user-shield me-2"></i> Yönetici Paneli</a></li>
+                            <li><a class="dropdown-item rounded" href="/profile"><i class="fas fa-user me-2 text-muted"></i> Profilim</a></li>
+                            <li><a class="dropdown-item rounded" href="/saved-posts"><i class="fas fa-bookmark me-2 text-muted"></i> Kaydedilenler</a></li>
+                            <li><a class="dropdown-item rounded" href="/settings"><i class="fas fa-cog me-2 text-muted"></i> Ayarlar</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item rounded text-danger fw-bold" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-6">
+                <h3 class="fw-bold text-primary"><i class="fas fa-store me-2"></i> Uni-Pazar</h3>
+                <p class="text-muted">Kitap, eşya, ev arkadaşı... Kampüsün ticaret merkezi.</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <button class="btn btn-primary-modern rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createProductModal">
+                    <i class="fas fa-plus-circle me-2"></i> İlan Ver
+                </button>
+            </div>
+        </div>
+
+        <div class="d-flex overflow-auto pb-3 mb-4 custom-scrollbar">
+            <a href="/market" th:classappend="${activeCategory == null} ? 'btn-primary-modern text-white' : 'bg-white text-muted'" class="btn rounded-pill me-2 border fw-bold text-nowrap">Tümü</a>
+            <a href="/market?category=Kitap" th:classappend="${activeCategory == 'Kitap'} ? 'btn-primary-modern text-white' : 'bg-white text-muted'" class="btn rounded-pill me-2 border fw-bold text-nowrap"><i class="fas fa-book me-1"></i> Kitap</a>
+            <a href="/market?category=Elektronik" th:classappend="${activeCategory == 'Elektronik'} ? 'btn-primary-modern text-white' : 'bg-white text-muted'" class="btn rounded-pill me-2 border fw-bold text-nowrap"><i class="fas fa-laptop me-1"></i> Elektronik</a>
+            <a href="/market?category=Ev Eşyası" th:classappend="${activeCategory == 'Ev Eşyası'} ? 'btn-primary-modern text-white' : 'bg-white text-muted'" class="btn rounded-pill me-2 border fw-bold text-nowrap"><i class="fas fa-couch me-1"></i> Ev Eşyası</a>
+            <a href="/market?category=Ev/Oda" th:classappend="${activeCategory == 'Ev/Oda'} ? 'btn-primary-modern text-white' : 'bg-white text-muted'" class="btn rounded-pill me-2 border fw-bold text-nowrap"><i class="fas fa-home me-1"></i> Ev & Oda</a>
+            <a href="/market?category=Özel Ders" th:classappend="${activeCategory == 'Özel Ders'} ? 'btn-primary-modern text-white' : 'bg-white text-muted'" class="btn rounded-pill me-2 border fw-bold text-nowrap"><i class="fas fa-graduation-cap me-1"></i> Özel Ders</a>
+        </div>
+
+        <div class="row g-4">
+            <div th:each="product : ${products}" class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card glass-card h-100 shadow-sm product-card"
+                     th:classappend="${product.seller.isVip()} ? 'vip-product' : ''">
+                    
+                    <div th:if="${product.seller.isVip()}" class="vip-badge"><i class="fas fa-fire me-1"></i> Fırsat</div>
+
+                    <img th:src="@{${product.getImagePath()}}" class="product-img">
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-light text-secondary border" th:text="${product.category}">Kategori</span>
+                            <small class="text-muted" th:text="${#temporals.format(product.createdAt, 'dd MMM')}">Tarih</small>
+                        </div>
+                        
+                        <h6 class="fw-bold mb-1 text-truncate" th:text="${product.title}">Ürün Başlığı</h6>
+                        <div class="price-tag mb-3" th:text="${product.price} + ' ₺'">0 ₺</div>
+                        
+                        <p class="text-muted small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" th:text="${product.description}">Açıklama...</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                            <div class="d-flex align-items-center">
+                                <img th:src="@{${product.seller.avatarPath}}" class="rounded-circle me-2 border" width="30" height="30">
+                                <small class="text-muted fw-bold" th:text="${#strings.abbreviate(product.seller.fullname, 15)}">Satıcı</small>
+                            </div>
+                            
+                            <a th:href="@{${product.getWhatsappLink()}}" target="_blank" class="btn btn-success btn-sm rounded-pill px-3">
+                                <i class="fab fa-whatsapp me-1"></i> Mesaj
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(products)}" class="col-12 text-center py-5">
+                <i class="fas fa-box-open fa-4x text-muted opacity-25 mb-3"></i>
+                <h5 class="text-muted">Bu kategoride henüz ilan yok.</h5>
+                <p class="small text-muted">İlk ilanı sen ver, hemen sat!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createProductModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light border-0">
+                    <h5 class="modal-title fw-bold text-primary"><i class="fas fa-tag me-2"></i> İlan Oluştur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/market/create" method="post" enctype="multipart/form-data">
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">İlan Başlığı</label>
+                            <input type="text" name="title" class="form-control" placeholder="Örn: Temiz Calculus Kitabı" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Fiyat (TL)</label>
+                                <input type="number" name="price" class="form-control" placeholder="0" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Kategori</label>
+                                <select name="category" class="form-select" required>
+                                    <option value="Kitap">Kitap & Kırtasiye</option>
+                                    <option value="Elektronik">Elektronik</option>
+                                    <option value="Ev Eşyası">Ev Eşyası</option>
+                                    <option value="Ev/Oda">Ev & Oda Arkadaşı</option>
+                                    <option value="Özel Ders">Özel Ders</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Telefon (WhatsApp)</label>
+                            <input type="text" name="contactNumber" class="form-control" placeholder="0532 555 44 33" required>
+                            <div class="form-text small">Alıcılar size bu numaradan ulaşacak.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Açıklama</label>
+                            <textarea name="description" class="form-control" rows="3" placeholder="Ürün durumu, detaylar..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Ürün Fotoğrafı</label>
+                            <input type="file" name="image" class="form-control" accept="image/*" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">İptal</button>
+                        <button type="submit" class="btn btn-primary-modern rounded-pill px-4">İlanı Yayınla</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        (function() {
+            let savedTheme = localStorage.getItem('theme') || 'light';
+            const isVip = [[${user.isVip}]];
+            if(savedTheme === 'gold' && !isVip) { savedTheme = 'light'; localStorage.setItem('theme', 'light'); }
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+</body>
+</html>

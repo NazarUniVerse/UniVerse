@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniVerse - Kampüsün Dijital Kalbi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="#"><i class="fas fa-graduation-cap"></i> UniVerse</a>
+            <div class="d-flex">
+                <a href="/login" class="btn btn-outline-primary me-2 rounded-pill px-4">Giriş</a>
+                <a href="/register" class="btn btn-primary-modern">Kayıt Ol</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="d-flex align-items-center justify-content-center" style="min-height: 90vh; padding-top: 80px;">
+        <div class="container text-center">
+            
+            <div th:if="${param.messageSent}" class="alert alert-success alert-dismissible fade show rounded-4 mb-4 col-lg-8 mx-auto" role="alert">
+                <i class="fas fa-check-circle me-2"></i> Mesajınız başarıyla iletildi!
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8 glass-card">
+                    <h1 class="display-4 fw-bold mb-4" style="color: #1e293b;">Kampüs Senin <span style="color: var(--primary-color);">Dünyan.</span></h1>
+                    <p class="lead mb-5 text-muted">Üniversite öğrencileri için tasarlanmış yeni nesil sosyal ağ. Not paylaş, sosyalleş, haberdar ol.</p>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="/register" class="btn btn-primary-modern btn-lg px-5">Hemen Başla <i class="fas fa-arrow-right ms-2"></i></a>
+                        <a href="#features" class="btn btn-outline-secondary btn-lg rounded-pill px-5">Keşfet</a>
+                    </div>
+
+                    <div class="row mt-5" id="features">
+                        <div class="col-md-4">
+                            <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                            <h5 class="fw-bold">Topluluklar</h5>
+                            <p class="small text-muted">Kulüplere katıl, etkinlikleri kaçırma.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-bolt fa-2x text-warning mb-3"></i>
+                            <h5 class="fw-bold">Hızlı Akış</h5>
+                            <p class="small text-muted">Kampüsteki olayları anında öğren.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-shield-alt fa-2x text-success mb-3"></i>
+                            <h5 class="fw-bold">Güvenli</h5>
+                            <p class="small text-muted">Sadece onaylı öğrenci profilleri.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" id="contact">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="glass-card">
+                        <h4 class="fw-bold text-primary mb-3 text-center">UniVerse ile İletişime Geçin</h4>
+                        <p class="text-muted small text-center mb-4">Geri bildirim veya beta erişimi için formu doldurun.</p>
+                        
+                        <form action="/contact" method="post">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" name="name" class="form-control form-control-modern" placeholder="Adınız" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="email" name="email" class="form-control form-control-modern" placeholder="E-posta" required>
+                                </div>
+                                <div class="col-12">
+                                    <textarea name="content" class="form-control form-control-modern" rows="4" placeholder="Mesajınız" required></textarea>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-primary-modern w-100">
+                                        Gönder <i class="fas fa-paper-plane ms-1"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center py-4 text-muted small">
+        &copy; 2026 UniVerse. Tüm hakları saklıdır.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Kayıt Ol - UniVerse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css"> </head>
+<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+
+    <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/"><i class="fas fa-graduation-cap"></i> UniVerse</a>
+            <a href="/login" class="btn btn-sm btn-outline-primary rounded-pill px-3">Giriş Yap</a>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 80px;">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="glass-card p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold brand-logo" style="font-size: 2rem;">Aramıza Katıl</h2>
+                        <p class="text-muted">Üniversite mailinle hemen kaydol.</p>
+                    </div>
+
+                    <div th:if="${error}" class="alert alert-danger text-center rounded-pill mb-4 shadow-sm">
+                        <i class="fas fa-exclamation-circle me-2"></i> <span th:text="${error}">Hata</span>
+                    </div>
+
+                    <form action="/register" method="post">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold ms-2">Ad Soyad</label>
+                            <input type="text" name="fullname" class="form-control" placeholder="Adınız Soyadınız" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold ms-2">Üniversite E-Postası</label>
+                            <input type="email" name="email" class="form-control" placeholder="ogrenci@istinye.edu.tr" required>
+                            <div class="form-text text-primary small ms-2 mt-1">
+                                <i class="fas fa-info-circle"></i> Sadece <b>.edu.tr</b> veya <b>.edu</b> uzantılı mailler.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold ms-2">Şifre</label>
+                            <input type="password" name="password" class="form-control" placeholder="********" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-bold ms-2">Bölüm / Program</label>
+                            <select name="department" class="form-select" required>
+                                <option value="" selected disabled>Bölümünüzü Seçiniz...</option>
+                                <optgroup label="Mühendislik ve Doğa Bilimleri Fakültesi">
+                                    <option value="Bilgisayar Mühendisliği">Bilgisayar Mühendisliği</option>
+                                    <option value="Yazılım Mühendisliği">Yazılım Mühendisliği</option>
+                                    <option value="Endüstri Mühendisliği">Endüstri Mühendisliği</option>
+                                </optgroup>
+                                <optgroup label="Tıp ve Sağlık Fakülteleri">
+                                    <option value="Tıp Fakültesi">Tıp</option>
+                                    <option value="Eczacılık">Eczacılık</option>
+                                    <option value="Diş Hekimliği">Diş Hekimliği</option>
+                                </optgroup>
+                                <optgroup label="Diğer">
+                                    <option value="İşletme">İşletme</option>
+                                    <option value="Psikoloji">Psikoloji</option>
+                                    <option value="Hukuk">Hukuk</option>
+                                    <option value="Mimarlık">Mimarlık</option>
+                                    <option value="Diğer">Diğer</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-modern w-100 py-2 shadow-sm">Kayıt Ol</button>
+                    </form>
+                    
+                    <div class="text-center mt-4 border-top pt-3">
+                        <span class="text-muted small">Zaten hesabın var mı?</span>
+                        <a href="/login" class="text-decoration-none fw-bold ms-1" style="color: var(--primary-color);">Giriş Yap</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+</body>
+</html>

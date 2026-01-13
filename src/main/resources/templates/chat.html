@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Sohbet - UniVerse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .chat-list { height: 80vh; overflow-y: auto; border-right: 1px solid var(--border-color); }
+        .chat-item { cursor: pointer; transition: all 0.2s; padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .chat-item:hover, .chat-item.active { background-color: var(--hover-bg); border-left: 4px solid var(--primary-color); }
+        
+        .chat-window { height: 80vh; display: flex; flex-direction: column; position: relative; }
+        
+        /* HEADER KISMI İÇİN Z-INDEX AYARI (Menü üste çıksın diye) */
+        .chat-header { 
+            z-index: 1000; 
+            position: relative; 
+            background-color: #f8f9fa; /* bg-light */
+        }
+
+        .messages-area { flex-grow: 1; overflow-y: auto; padding: 20px; background: rgba(0,0,0,0.02); display: flex; flex-direction: column; }
+        
+        .message-bubble { max-width: 70%; padding: 12px 18px; border-radius: 20px; margin-bottom: 10px; position: relative; }
+        .message-sent { background: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 5px; }
+        .message-received { background: white; color: var(--text-color); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 5px; }
+        .message-status { font-size: 0.7rem; margin-left: 5px; opacity: 0.8; }
+        
+        .online-dot { width: 12px; height: 12px; background-color: #2ecc71; border: 2px solid white; border-radius: 50%; position: absolute; bottom: 0; right: 0; }
+    </style>
+</head>
+<body style="padding-top: 80px;">
+
+    <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/home"><i class="fas fa-graduation-cap"></i> UniVerse</a>
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/home"><i class="fas fa-arrow-left me-1"></i> Akışa Dön</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-lg-5">
+        <div class="row g-0 glass-card" style="min-height: 80vh;">
+            
+            <div class="col-md-4 chat-list bg-white">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+                    <h5 class="fw-bold m-0 text-primary">Sohbetler</h5>
+                    <button class="btn btn-sm btn-primary-modern rounded-circle" data-bs-toggle="modal" data-bs-target="#createGroupModal" title="Yeni Grup">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <div th:if="${#lists.isEmpty(chats)}" class="text-center py-5 text-muted">
+                    <p>Henüz sohbet yok.</p>
+                </div>
+
+                <a th:each="chat : ${chats}" th:href="@{'/chat?groupId=' + ${chat.id}}" class="text-decoration-none text-dark">
+                    <div class="chat-item d-flex align-items-center p-3 border-bottom" 
+                         th:classappend="${activeChat != null && activeChat.id == chat.id} ? 'active' : ''">
+                        
+                        <div class="position-relative me-3">
+                            <img th:if="${chat.isPrivate}" th:src="@{${chat.getOtherUser(user).avatarPath}}" class="rounded-circle border" width="50" height="50" style="object-fit: cover;">
+                            <img th:unless="${chat.isPrivate}" src="/images/default-group.png" class="rounded-circle border" width="50" height="50" style="object-fit: cover;">
+                            
+                            <span th:if="${chat.isPrivate && chat.getOtherUser(user).isOnline()}" class="online-dot"></span>
+                        </div>
+
+                        <div class="flex-grow-1 overflow-hidden">
+                            <h6 class="mb-1 fw-bold text-truncate" th:text="${chat.isPrivate ? chat.getOtherUser(user).fullname : chat.name}">İsim</h6>
+                            <small class="text-muted text-truncate d-block" th:text="${chat.getLastMessage()}">Mesaj...</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-8 bg-white chat-window">
+                
+                <div th:if="${activeChat == null}" class="d-flex align-items-center justify-content-center h-100 flex-column text-muted">
+                    <i class="far fa-comments fa-5x mb-3 opacity-25"></i>
+                    <h4>Sohbet Seçin</h4>
+                    <p>Soldan bir kişi seç veya yeni grup kur.</p>
+                </div>
+
+                <div th:if="${activeChat != null}" class="d-flex flex-column h-100">
+                    
+                    <div class="p-3 border-bottom d-flex align-items-center justify-content-between chat-header shadow-sm">
+                        <div class="d-flex align-items-center">
+                            <div class="position-relative me-3">
+                                <img th:src="@{${chatAvatar}}" class="rounded-circle border" width="40" height="40" style="object-fit: cover;">
+                                <span th:if="${activeChat.isPrivate && activeChat.getOtherUser(user).isOnline()}" class="online-dot" style="width: 10px; height: 10px; right: -2px; bottom: 0;"></span>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold" th:text="${chatTitle}">İsim</h6>
+                                <small class="text-muted" th:text="${chatUserStatus}">Durum</small>
+                            </div>
+                        </div>
+                        
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 35px; height: 35px;">
+                                <i class="fas fa-ellipsis-v text-muted"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow" style="min-width: 200px;">
+                                <li th:if="${activeChat.isPrivate}">
+                                    <a class="dropdown-item" th:href="@{'/user/' + ${chatUserId}}"><i class="fas fa-user me-2 text-primary"></i> Profili Gör</a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" th:href="@{'/chat/clear/' + ${activeChat.id}}" onclick="return confirm('Bu sohbet temizlensin mi?')">
+                                        <i class="fas fa-trash-alt me-2 text-warning"></i> Sohbeti Temizle
+                                    </a>
+                                </li>
+                                <li th:if="${activeChat.isPrivate}">
+                                    <a class="dropdown-item text-danger" th:href="@{'/user/block/' + ${chatUserId}}" onclick="return confirm('Emin misin?')">
+                                        <i class="fas fa-ban me-2"></i> Engelle / Kaldır
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="messages-area" id="messagesArea">
+                        <div th:each="msg : ${activeChat.messages}" 
+                             class="message-bubble shadow-sm"
+                             th:classappend="${msg.sender.id == user.id} ? 'message-sent' : 'message-received'">
+                            
+                            <small th:if="${!activeChat.isPrivate && msg.sender.id != user.id}" class="d-block fw-bold text-primary mb-1" th:text="${msg.sender.fullname}">Gönderen</small>
+                            
+                            <span th:text="${msg.content}">Mesaj</span>
+                            
+                            <div class="text-end mt-1" style="font-size: 0.65rem; opacity: 0.7;">
+                                <span th:text="${msg.getFormattedTime()}">12:00</span>
+                                <span th:if="${msg.sender.id == user.id}" class="message-status">
+                                    <i th:if="${msg.status == 'İletildi'}" class="fas fa-check"></i>
+                                    <i th:if="${msg.status == 'Okundu'}" class="fas fa-check-double text-info" style="color: #69f0ae !important;"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 border-top bg-light">
+                        <form action="/chat/send" method="post" class="d-flex">
+                            <input type="hidden" name="groupId" th:value="${activeChat.id}">
+                            <input type="text" name="content" class="form-control rounded-pill me-2 border-0 shadow-sm" placeholder="Bir şeyler yaz..." required autocomplete="off">
+                            <button type="submit" class="btn btn-primary-modern rounded-circle shadow-sm" style="width: 45px; height: 45px;"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="createGroupModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light border-0">
+                    <h5 class="modal-title fw-bold text-primary">Grup Oluştur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form action="/chat/create-group" method="post">
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label class="small fw-bold">Grup Adı</label>
+                            <input type="text" name="groupName" class="form-control rounded-pill" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold">Katılımcılar</label>
+                            <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                                <div th:each="f : ${following}" class="form-check p-1 border-bottom">
+                                    <input class="form-check-input" type="checkbox" name="participants" th:value="${f.id}" th:id="'u'+${f.id}">
+                                    <label class="form-check-label ms-2 d-flex align-items-center" th:for="'u'+${f.id}">
+                                        <img th:src="@{${f.avatarPath}}" class="rounded-circle me-2" width="25" height="25">
+                                        <span th:text="${f.fullname}">İsim</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="submit" class="btn btn-primary-modern rounded-pill px-4">Oluştur</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.onload = function() {
+            var msgArea = document.getElementById("messagesArea");
+            if(msgArea) msgArea.scrollTop = msgArea.scrollHeight;
+        };
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+</body>
+</html>

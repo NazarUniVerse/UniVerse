@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Profili Düzenle - UniVerse</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body style="padding-top: 90px;"> <nav class="navbar navbar-expand-lg navbar-modern fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/home"><i class="fas fa-graduation-cap"></i> UniVerse</a>
+            <a href="/home" class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="fas fa-arrow-left me-1"></i> Akışa Dön</a>
+        </div>
+    </nav>
+
+    <div class="container pb-5"> <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10"> <h3 class="fw-bold mb-4 text-primary text-center text-md-start"><i class="fas fa-user-edit me-2"></i> Profili Düzenle</h3>
+                
+                <div class="card glass-card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <form action="/profile/update" method="post" enctype="multipart/form-data">
+                            
+                            <div class="text-center mb-4">
+                                <div class="position-relative d-inline-block">
+                                    <img th:if="${user.avatar != null}" th:src="@{${user.avatarPath}}" class="rounded-circle border border-3 shadow-sm" width="120" height="120" style="object-fit: cover; border-color: var(--primary-color) !important;">
+                                    <div th:if="${user.avatar == null}" class="avatar mx-auto border border-3 shadow-sm d-flex align-items-center justify-content-center bg-light text-primary" style="width: 120px; height: 120px; font-size: 3rem; border-color: var(--primary-color) !important; border-radius: 50%;">
+                                        <span th:text="${#strings.substring(user.fullname,0,1)}">U</span>
+                                    </div>
+                                    <label class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle shadow-sm hover-scale" style="cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: 2px solid white;">
+                                        <i class="fas fa-camera"></i>
+                                        <input type="file" name="avatar" class="d-none" accept="image/png, image/jpeg">
+                                    </label>
+                                </div>
+                                <p class="text-muted small mt-2 mb-0">Fotoğrafı değiştirmek için ikona tıkla</p>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-muted">Ad Soyad</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user text-muted"></i></span>
+                                        <input type="text" name="fullname" class="form-control" th:value="${user.fullname}" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-muted">E-Posta</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="fas fa-envelope text-muted"></i></span>
+                                        <input type="text" class="form-control bg-light text-muted" th:value="${user.email}" disabled readonly>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small text-muted">Bölüm / Program</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-university text-muted"></i></span>
+                                        <select name="department" id="deptSelect" class="form-select" required style="max-height: 200px; overflow-y: auto;">
+                                            <option value="" disabled>Bölümünüzü Seçiniz...</option>
+                                            <optgroup label="Mühendislik ve Doğa Bilimleri Fakültesi"><option value="Bilgisayar Mühendisliği">Bilgisayar Mühendisliği</option><option value="Yazılım Mühendisliği">Yazılım Mühendisliği</option><option value="Endüstri Mühendisliği">Endüstri Mühendisliği</option></optgroup>
+                                            <optgroup label="Tıp ve Sağlık Fakülteleri"><option value="Tıp Fakültesi">Tıp</option><option value="Eczacılık">Eczacılık</option></optgroup>
+                                            <optgroup label="Diğer"><option value="İşletme">İşletme</option><option value="Hukuk">Hukuk</option></optgroup>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small text-muted"><i class="fas fa-music text-danger"></i> Profil Müziği (MP3)</label>
+                                    <div class="input-group">
+                                        <input type="file" name="music" class="form-control" accept="audio/mpeg, audio/mp3">
+                                        <span class="input-group-text" th:if="${user.profileMusic != null}"><i class="fas fa-check text-success"></i></span>
+                                    </div>
+                                    <div class="form-text small">Profilinize girenler için çalacak bir şarkı yükleyin (Max 10MB).</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small text-muted">Hakkında (Bio)</label>
+                                    <textarea name="bio" class="form-control" rows="3" th:text="${user.bio}" placeholder="Kendinden bahset..."></textarea>
+                                </div>
+
+                                <div class="col-12 mt-4 text-end">
+                                    <a href="/home" class="btn btn-light border rounded-pill px-4 me-2">İptal</a>
+                                    <button type="submit" class="btn btn-primary-modern px-5 rounded-pill">Kaydet <i class="fas fa-check-circle ms-2"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent border-top p-3">
+                        <div class="row text-center">
+                            <div class="col-4"><h4 class="fw-bold mb-0 text-primary">-</h4><small class="text-muted fw-bold">Gönderi</small></div>
+                            <div class="col-4 border-start border-end"><h4 class="fw-bold mb-0 text-primary" th:text="${user.getFollowersCount()}">0</h4><small class="text-muted fw-bold">Takipçi</small></div>
+                            <div class="col-4"><h4 class="fw-bold mb-0 text-primary" th:text="${user.getFollowingCount()}">0</h4><small class="text-muted fw-bold">Takip</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+        window.onload = function() {
+            var userDept = "[[${user.department}]]";
+            var selectBox = document.getElementById('deptSelect');
+            if(userDept && userDept !== 'null' && selectBox) {
+                selectBox.value = userDept;
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

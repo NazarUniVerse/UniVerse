@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gelen Mesajlar - Yönetici</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body style="padding-top: 80px;">
+
+    <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
+        <div class="container">
+            <a class="navbar-brand brand-logo" href="/home"><i class="fas fa-graduation-cap"></i> UniVerse Admin</a>
+            <div class="d-flex align-items-center">
+                 <a href="/home" class="btn btn-sm btn-outline-primary rounded-pill me-2"><i class="fas fa-arrow-left"></i> Siteye Dön</a>
+                 <a href="/logout" class="btn btn-sm btn-danger rounded-pill">Çıkış</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <div class="glass-card mb-4">
+                    <h3 class="fw-bold mb-4 text-primary"><i class="fas fa-inbox me-2"></i> Gelen İletişim Mesajları</h3>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Gönderen</th>
+                                    <th>E-Posta</th>
+                                    <th>Mesaj</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                               <tr th:each="msg : ${messages}">
+                                    <td class="small text-muted" th:text="${#temporals.format(msg.createdAt, 'dd.MM.yyyy HH:mm')}">Tarih</td>
+                                    <td class="fw-bold" th:text="${msg.name}">İsim</td>
+                                    <td><a th:href="'mailto:' + ${msg.email}" class="text-decoration-none" th:text="${msg.email}">email</a></td>
+                                    
+                                    <td th:text="${msg.content}" class="text-secondary">Mesaj İçeriği...</td>
+                                    
+                                    <td>
+                                        <a th:href="@{'/admin/messages/delete/' + ${msg.id}}" 
+                                           class="btn btn-sm btn-outline-danger border-0"
+                                           onclick="return confirm('Bu mesajı silmek istediğine emin misin?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(messages)}">
+                                    <td colspan="5" class="text-center py-4 text-muted">Henüz hiç mesaj yok.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

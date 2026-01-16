@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <style>
         /* GENEL AYARLAR */
-        body { padding-top: 70px; padding-bottom: 80px; background-color: #f0f2f5; } /* Telefonda alt bar için boşluk */
+        body { padding-top: 80px; padding-bottom: 80px; background-color: #f0f2f5; }
         
         /* HİKAYE STİLLERİ */
         .story-avatar { width: 62px; height: 62px; object-fit: cover; border-radius: 50%; border: 3px solid #ec4899; padding: 2px; transition: 0.2s; }
@@ -21,7 +21,19 @@
         .anonymous-card .text-muted { color: #b2bec3 !important; }
         .anonymous-card h6 { color: #fff !important; }
 
-        /* MOBİL İÇİN ÖZEL ALT BAR (BOTTOM NAV) */
+        /* NAV LINK STİLLERİ (Üst Menü İçin) */
+        .nav-link { 
+            color: #65676b; 
+            font-weight: 600; 
+            padding: 10px 15px !important; 
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+        .nav-link:hover { background-color: #f0f2f5; color: var(--primary-color); }
+        .nav-link.active { color: #0d6efd; background-color: #e7f1ff; }
+        .nav-link i { margin-right: 5px; font-size: 1.1rem; }
+
+        /* MOBİL İÇİN ÖZEL ALT BAR */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: white; border-top: 1px solid #eee;
@@ -37,12 +49,11 @@
             margin-top: -25px; border: 4px solid #f0f2f5; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
         }
         
-        /* SCROLLBAR GİZLEME (Şık Görünüm İçin) */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         @media (min-width: 992px) {
-            .bottom-nav { display: none; } /* Bilgisayarda alt barı gizle */
+            .bottom-nav { display: none; }
             body { padding-bottom: 0; }
         }
     </style>
@@ -59,22 +70,44 @@
                  <a href="/chat" class="text-dark position-relative me-2">
                     <i class="fab fa-facebook-messenger fa-xl"></i>
                  </a>
+                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                 </button>
             </div>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link active fw-bold" href="/home">Akış</a></li>
-                    <li class="nav-item mx-2"><a class="nav-link" href="/chat"><i class="fas fa-comment-dots"></i></a></li>
-                    <li class="nav-item dropdown ms-3">
+                <ul class="navbar-nav mx-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/home" title="Akış"><i class="fas fa-home"></i> Akış</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/notes" title="Not Havuzu"><i class="fas fa-book"></i> Notlar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/events" title="Etkinlikler"><i class="fas fa-calendar-alt"></i> Etkinlikler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/market" title="Uni-Pazar"><i class="fas fa-store"></i> Uni-Pazar</a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item d-none d-lg-block me-2">
+                        <a class="nav-link rounded-circle bg-light p-2" href="/chat" title="Mesajlar" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-comment-dots m-0"></i>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item dropdown ms-2">
                         <a class="nav-link dropdown-toggle p-0" href="#" data-bs-toggle="dropdown">
                             <img th:src="${user.avatarPath}" class="rounded-circle border" width="40" height="40">
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
                             <li><h6 class="dropdown-header" th:text="${username}">Kullanıcı</h6></li>
-                            <li><a class="dropdown-item" href="/profile">Profilim</a></li>
-                            <li><a class="dropdown-item" href="/settings">Ayarlar</a></li>
+                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profilim</a></li>
+                            <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i> Ayarlar</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="/logout">Çıkış</a></li>
+                            <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Çıkış</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -85,24 +118,7 @@
     <div class="container">
         <div class="row justify-content-center">
             
-            <div class="col-lg-3 d-none d-lg-block">
-                <div class="card border-0 shadow-sm sticky-top" style="top: 90px; border-radius: 15px;">
-                    <div class="card-body text-center">
-                        <img th:src="${user.avatarPath}" class="rounded-circle border border-3 border-primary mb-2" width="80" height="80">
-                        <h5 class="fw-bold mb-0" th:text="${username}">İsim</h5>
-                        <small class="text-muted" th:text="${user.department}">Bölüm</small>
-                        <hr>
-                        <ul class="list-unstyled text-start">
-                            <li class="mb-2"><a href="/home" class="btn btn-light w-100 text-start fw-bold text-primary"><i class="fas fa-home me-2"></i> Genel Akış</a></li>
-                            <li class="mb-2"><a href="/home?category=Kampus" class="btn btn-white w-100 text-start"><i class="fas fa-university me-2 text-warning"></i> Kampüs</a></li>
-                            <li class="mb-2"><a href="/notes" class="btn btn-white w-100 text-start"><i class="fas fa-book me-2 text-success"></i> Not Havuzu</a></li>
-                            <li class="mb-2"><a href="/events" class="btn btn-white w-100 text-start"><i class="fas fa-calendar-alt me-2 text-danger"></i> Etkinlikler</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 col-md-12">
+            <div class="col-lg-8 col-md-12">
                 
                 <div class="bg-white p-3 mb-4 rounded-4 shadow-sm d-flex align-items-center no-scrollbar" style="overflow-x: auto; white-space: nowrap;">
                     <div class="story-item" data-bs-toggle="modal" data-bs-target="#uploadStoryModal">
@@ -193,7 +209,7 @@
                 </div>
             </div>
 
-            <div class="col-lg-3 d-none d-lg-block">
+            <div class="col-lg-4 d-none d-lg-block">
                 <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 90px;">
                     <div class="card-body">
                         <h6 class="fw-bold text-muted mb-3">Trendler</h6>
@@ -201,6 +217,7 @@
                             <span class="badge bg-light text-dark border p-2 m-1">#VizeHaftası</span>
                             <span class="badge bg-light text-dark border p-2 m-1">#İstinyeFest</span>
                             <span class="badge bg-light text-dark border p-2 m-1">#Yemekhane</span>
+                            <span class="badge bg-light text-dark border p-2 m-1">#UniPazar</span>
                         </div>
                     </div>
                 </div>

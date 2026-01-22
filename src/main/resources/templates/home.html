@@ -7,55 +7,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        /* GENEL AYARLAR */
         body { padding-top: 80px; padding-bottom: 80px; background-color: #f0f2f5; }
-        
-        /* HİKAYE STİLLERİ */
         .story-avatar { width: 62px; height: 62px; object-fit: cover; border-radius: 50%; border: 3px solid #ec4899; padding: 2px; transition: 0.2s; }
         .story-avatar:hover { transform: scale(1.05); }
         .story-item { cursor: pointer; text-align: center; margin-right: 12px; display: inline-block; width: 70px; }
         .story-name { font-size: 0.7rem; margin-top: 4px; color: #333; max-width: 70px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-        
-        /* GİZLİ GÖNDERİ STİLİ */
         .anonymous-card { background-color: #2d3436 !important; color: #dfe6e9 !important; border: 1px solid #636e72; }
         .anonymous-card .text-muted { color: #b2bec3 !important; }
         .anonymous-card h6 { color: #fff !important; }
-
-        /* NAV LINK STİLLERİ (Üst Menü İçin) */
-        .nav-link { 
-            color: #65676b; 
-            font-weight: 600; 
-            padding: 10px 15px !important; 
-            border-radius: 10px;
-            transition: 0.2s;
-        }
+        /* NAV LINKLERİ */
+        .nav-link { color: #65676b; font-weight: 600; padding: 10px 15px !important; border-radius: 10px; transition: 0.2s; }
         .nav-link:hover { background-color: #f0f2f5; color: var(--primary-color); }
         .nav-link.active { color: #0d6efd; background-color: #e7f1ff; }
         .nav-link i { margin-right: 5px; font-size: 1.1rem; }
-
-        /* MOBİL İÇİN ÖZEL ALT BAR */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: white; border-top: 1px solid #eee;
-            display: flex; justify-content: space-around; align-items: center;
-            padding: 10px 0; z-index: 1050; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
+        /* MOBİL ALT BAR */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; padding: 10px 0; z-index: 1050; }
         .nav-item-mobile { text-align: center; color: #65676b; text-decoration: none; font-size: 0.75rem; }
         .nav-item-mobile i { font-size: 1.4rem; margin-bottom: 2px; display: block; }
         .nav-item-mobile.active { color: #0d6efd; font-weight: bold; }
-        .mobile-add-btn {
-            background: #0d6efd; color: white; width: 45px; height: 45px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin-top: -25px; border: 4px solid #f0f2f5; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
-        }
-        
+        .mobile-add-btn { background: #0d6efd; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -25px; border: 4px solid #f0f2f5; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        @media (min-width: 992px) {
-            .bottom-nav { display: none; }
-            body { padding-bottom: 0; }
-        }
+        @media (min-width: 992px) { .bottom-nav { display: none; } body { padding-bottom: 0; } }
     </style>
 </head>
 <body>
@@ -67,28 +40,17 @@
             </a>
             
             <div class="d-flex d-lg-none align-items-center">
-                 <a href="/chat" class="text-dark position-relative me-2">
-                    <i class="fab fa-facebook-messenger fa-xl"></i>
-                 </a>
-                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                 </button>
+                 <a href="/chat" class="text-dark position-relative me-2"><i class="fab fa-facebook-messenger fa-xl"></i></a>
+                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
             </div>
 
             <div class="collapse navbar-collapse" id="navbarNav">
+                
                 <ul class="navbar-nav mx-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/home" title="Akış"><i class="fas fa-home"></i> Akış</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/notes" title="Not Havuzu"><i class="fas fa-book"></i> Notlar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/events" title="Etkinlikler"><i class="fas fa-calendar-alt"></i> Etkinlikler</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/market" title="Uni-Pazar"><i class="fas fa-store"></i> Uni-Pazar</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link active" href="/home"><i class="fas fa-home"></i> Akış</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/notes"><i class="fas fa-book"></i> Notlar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/events"><i class="fas fa-calendar-alt"></i> Etkinlikler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/market"><i class="fas fa-store"></i> Uni-Pazar</a></li>
                 </ul>
 
                 <ul class="navbar-nav align-items-center">
@@ -98,16 +60,23 @@
                         </a>
                     </li>
                     
+                    <li class="nav-item me-2">
+                        <a class="nav-link rounded-circle bg-light p-2 position-relative" href="/notifications" title="Bildirimler" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-bell m-0"></i>
+                            <span th:if="${unreadCount > 0}" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 10px; height: 10px;"></span>
+                        </a>
+                    </li>
+                    
                     <li class="nav-item dropdown ms-2">
                         <a class="nav-link dropdown-toggle p-0" href="#" data-bs-toggle="dropdown">
                             <img th:src="${user.avatarPath}" class="rounded-circle border" width="40" height="40">
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
                             <li><h6 class="dropdown-header" th:text="${username}">Kullanıcı</h6></li>
-                            <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> Profilim</a></li>
-                            <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i> Ayarlar</a></li>
+                            <li><a class="dropdown-item" href="/profile">Profilim</a></li>
+                            <li><a class="dropdown-item" href="/settings">Ayarlar</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i> Çıkış</a></li>
+                            <li><a class="dropdown-item text-danger" href="/logout">Çıkış</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -117,14 +86,10 @@
 
     <div class="container">
         <div class="row justify-content-center">
-            
             <div class="col-lg-8 col-md-12">
-                
                 <div class="bg-white p-3 mb-4 rounded-4 shadow-sm d-flex align-items-center no-scrollbar" style="overflow-x: auto; white-space: nowrap;">
                     <div class="story-item" data-bs-toggle="modal" data-bs-target="#uploadStoryModal">
-                        <div class="story-avatar d-flex align-items-center justify-content-center bg-light border-0">
-                            <i class="fas fa-plus fa-lg text-primary"></i>
-                        </div>
+                        <div class="story-avatar d-flex align-items-center justify-content-center bg-light border-0"><i class="fas fa-plus fa-lg text-primary"></i></div>
                         <div class="story-name fw-bold">Hikaye Ekle</div>
                     </div>
                     <div th:each="story : ${stories}" class="story-item" data-bs-toggle="modal" th:data-bs-target="'#viewStoryModal' + ${story.id}" th:onclick="'markStoryViewed(' + ${story.id} + ')'">
@@ -161,48 +126,27 @@
                                 <a th:if="${!post.isAnonymous()}" th:href="@{'/user/' + ${post.authorId}}" class="text-decoration-none text-dark d-flex align-items-center">
                                     <img th:src="${post.authorAvatar}" class="rounded-circle me-2 border" width="45" height="45">
                                     <div style="line-height: 1.2;">
-                                        <h6 class="fw-bold mb-0" th:text="${post.authorName}" style="font-size: 0.95rem;"></h6>
-                                        <small class="text-muted" th:text="${post.timeAgo}" style="font-size: 0.75rem;"></small>
+                                        <h6 class="fw-bold mb-0" th:text="${post.authorName}"></h6>
+                                        <small class="text-muted" th:text="${post.timeAgo}"></small>
                                     </div>
                                 </a>
                                 <div th:if="${post.isAnonymous()}" class="d-flex align-items-center">
-                                    <div class="rounded-circle me-2 border bg-dark d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                                        <i class="fas fa-user-secret text-white"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="fw-bold mb-0 text-white">Gizli İtirafçı</h6>
-                                        <small class="text-muted" th:text="${post.timeAgo}"></small>
-                                    </div>
+                                    <div class="rounded-circle me-2 border bg-dark d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;"><i class="fas fa-user-secret text-white"></i></div>
+                                    <div><h6 class="fw-bold mb-0 text-white">Gizli İtirafçı</h6><small class="text-muted" th:text="${post.timeAgo}"></small></div>
                                 </div>
                             </div>
                             <a th:href="@{'/post/save/' + ${post.id}}" class="btn btn-link text-muted p-0"><i th:class="${user.savedPosts.contains(post)} ? 'fas fa-bookmark text-primary' : 'far fa-bookmark'"></i></a>
                         </div>
-
-                        <p class="card-text" th:text="${post.content}" style="font-size: 0.95rem;"></p>
-                        <div th:if="${post.imageUrl != null}" class="mb-3">
-                            <img th:src="@{'/uploads/' + ${post.id} + '/' + ${post.imageUrl}}" class="img-fluid rounded-3 w-100 border">
-                        </div>
-
+                        <p class="card-text" th:text="${post.content}"></p>
+                        <div th:if="${post.imageUrl != null}" class="mb-3"><img th:src="@{'/uploads/' + ${post.id} + '/' + ${post.imageUrl}}" class="img-fluid rounded-3 w-100 border"></div>
                         <div class="d-flex justify-content-between border-top pt-3">
-                            <a th:href="@{'/post/like/' + ${post.id}}" class="btn btn-light rounded-pill btn-sm flex-fill me-1" th:classappend="${post.likedByCurrentUser} ? 'text-danger fw-bold' : ''">
-                                <i class="fas fa-heart"></i> <span th:text="${post.getLikeCount()}"></span>
-                            </a>
-                            <button class="btn btn-light rounded-pill btn-sm flex-fill ms-1 text-muted" data-bs-toggle="collapse" th:data-bs-target="'#c'+${post.id}">
-                                <i class="far fa-comment"></i> <span th:text="${post.comments.size()}"></span>
-                            </button>
+                            <a th:href="@{'/post/like/' + ${post.id}}" class="btn btn-light rounded-pill btn-sm flex-fill me-1" th:classappend="${post.likedByCurrentUser} ? 'text-danger fw-bold' : ''"><i class="fas fa-heart"></i> <span th:text="${post.getLikeCount()}"></span></a>
+                            <button class="btn btn-light rounded-pill btn-sm flex-fill ms-1 text-muted" data-bs-toggle="collapse" th:data-bs-target="'#c'+${post.id}"><i class="far fa-comment"></i> <span th:text="${post.comments.size()}"></span></button>
                         </div>
-                        
                         <div class="collapse mt-3" th:id="'c'+${post.id}">
                             <div class="bg-light p-3 rounded-3 border">
-                                <div th:each="comment : ${post.comments}" class="mb-2 border-bottom pb-2">
-                                    <strong class="text-dark small" th:text="${comment.authorName}">Biri</strong>: 
-                                    <span class="text-muted small" th:text="${comment.content}">Yorum...</span>
-                                </div>
-                                <form action="/post/comment" method="post" class="mt-2 d-flex">
-                                    <input type="hidden" name="postId" th:value="${post.id}">
-                                    <input type="text" name="content" class="form-control form-control-sm rounded-pill me-2" placeholder="Yorum yaz..." required>
-                                    <button type="submit" class="btn btn-sm btn-primary rounded-circle"><i class="fas fa-paper-plane"></i></button>
-                                </form>
+                                <div th:each="comment : ${post.comments}" class="mb-2 border-bottom pb-2"><strong class="text-dark small" th:text="${comment.authorName}"></strong>: <span class="text-muted small" th:text="${comment.content}"></span></div>
+                                <form action="/post/comment" method="post" class="mt-2 d-flex"><input type="hidden" name="postId" th:value="${post.id}"><input type="text" name="content" class="form-control form-control-sm rounded-pill me-2" placeholder="Yorum yaz..." required><button type="submit" class="btn btn-sm btn-primary rounded-circle"><i class="fas fa-paper-plane"></i></button></form>
                             </div>
                         </div>
                     </div>
@@ -226,37 +170,17 @@
     </div>
 
     <div class="bottom-nav d-lg-none">
-        <a href="/home" class="nav-item-mobile active">
-            <i class="fas fa-home"></i>
-            <span>Akış</span>
-        </a>
-        <a href="/home?category=Kampus" class="nav-item-mobile">
-            <i class="fas fa-search"></i>
-            <span>Kampüs</span>
-        </a>
-        <a href="#uploadStoryModal" data-bs-toggle="modal" class="nav-item-mobile mobile-add-btn">
-            <i class="fas fa-plus fa-lg text-white"></i>
-        </a>
-        <a href="/notifications" class="nav-item-mobile position-relative">
-            <i class="fas fa-bell"></i>
-            <span th:if="${unreadCount > 0}" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 10px; height: 10px;"></span>
-            <span>Bildirim</span>
-        </a>
-        <a href="/profile" class="nav-item-mobile">
-            <img th:src="${user.avatarPath}" class="rounded-circle border" width="24" height="24">
-            <span class="d-block">Profil</span>
-        </a>
+        <a href="/home" class="nav-item-mobile active"><i class="fas fa-home"></i><span>Akış</span></a>
+        <a href="/home?category=Kampus" class="nav-item-mobile"><i class="fas fa-search"></i><span>Kampüs</span></a>
+        <a href="#uploadStoryModal" data-bs-toggle="modal" class="nav-item-mobile mobile-add-btn"><i class="fas fa-plus fa-lg text-white"></i></a>
+        <a href="/notifications" class="nav-item-mobile position-relative"><i class="fas fa-bell"></i><span th:if="${unreadCount > 0}" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 10px; height: 10px;"></span><span>Bildirim</span></a>
+        <a href="/profile" class="nav-item-mobile"><img th:src="${user.avatarPath}" class="rounded-circle border" width="24" height="24"><span class="d-block">Profil</span></a>
     </div>
 
-    <div th:each="story : ${stories}" class="modal fade" th:id="'viewStoryModal' + ${story.id}" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-transparent border-0"><div class="modal-body p-0 text-center position-relative"><button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal"></button><img th:src="@{${story.getImagePath()}}" class="img-fluid rounded-4 shadow-lg" style="max-height: 80vh;"><div class="position-absolute bottom-0 start-0 p-3 text-white text-start w-100 d-flex justify-content-between align-items-end" style="background: linear-gradient(transparent, rgba(0,0,0,0.8)); border-radius: 0 0 1rem 1rem;"><div class="d-flex align-items-center"><img th:src="${story.user.avatarPath}" class="rounded-circle border border-2 me-2" width="40" height="40"><h6 class="mb-0 fw-bold" th:text="${story.user.fullname}"></h6></div></div></div></div></div>
-    </div>
-    
+    <div th:each="story : ${stories}" class="modal fade" th:id="'viewStoryModal' + ${story.id}" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-transparent border-0"><div class="modal-body p-0 text-center position-relative"><button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal"></button><img th:src="@{${story.getImagePath()}}" class="img-fluid rounded-4 shadow-lg" style="max-height: 80vh;"><div class="position-absolute bottom-0 start-0 p-3 text-white text-start w-100 d-flex justify-content-between align-items-end" style="background: linear-gradient(transparent, rgba(0,0,0,0.8)); border-radius: 0 0 1rem 1rem;"><div class="d-flex align-items-center"><img th:src="${story.user.avatarPath}" class="rounded-circle border border-2 me-2" width="40" height="40"><h6 class="mb-0 fw-bold" th:text="${story.user.fullname}"></h6></div></div></div></div></div></div>
     <div class="modal fade" id="uploadStoryModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 rounded-4"><div class="modal-header border-0"><h5 class="modal-title fw-bold">Hikaye Ekle</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><form action="/story/upload" method="post" enctype="multipart/form-data"><div class="modal-body"><div class="upload-area bg-light p-5 text-center rounded-3 border border-2 border-dashed"><i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i><br><input type="file" name="image" class="form-control" accept="image/*" required></div></div><div class="modal-footer border-0"><button type="submit" class="btn btn-primary rounded-pill w-100 py-2">Paylaş</button></div></form></div></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script th:inline="javascript">
-        function markStoryViewed(id){fetch('/story/view/'+id)}
-    </script>
+    <script th:inline="javascript">function markStoryViewed(id){fetch('/story/view/'+id)}</script>
 </body>
 </html>

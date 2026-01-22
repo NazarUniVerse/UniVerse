@@ -24,6 +24,12 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm border-bottom">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary" href="/home" style="font-size: 1.5rem;"><i class="fas fa-graduation-cap"></i> UniVerse</a>
+            
+            <div class="d-flex d-lg-none align-items-center">
+                 <a href="/chat" class="text-dark position-relative me-2"><i class="fab fa-facebook-messenger fa-xl"></i></a>
+                 <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            </div>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mx-auto align-items-center">
                     <li class="nav-item"><a class="nav-link" href="/home"><i class="fas fa-home"></i> Akış</a></li>
@@ -31,8 +37,15 @@
                     <li class="nav-item"><a class="nav-link active" href="/events"><i class="fas fa-calendar-alt"></i> Etkinlikler</a></li>
                     <li class="nav-item"><a class="nav-link" href="/market"><i class="fas fa-store"></i> Uni-Pazar</a></li>
                 </ul>
+
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item d-none d-lg-block me-2"><a class="nav-link rounded-circle bg-light p-2" href="/chat" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-comment-dots m-0"></i></a></li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link rounded-circle bg-light p-2 position-relative" href="/notifications" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-bell m-0"></i>
+                            <span th:if="${unreadCount > 0}" class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle" style="width: 10px; height: 10px;"></span>
+                        </a>
+                    </li>
                     <li class="nav-item dropdown ms-2">
                         <a class="nav-link dropdown-toggle p-0" href="#" data-bs-toggle="dropdown"><img th:src="${user.avatarPath}" class="rounded-circle border" width="40" height="40"></a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
@@ -65,7 +78,6 @@
                             <a href="/events" class="btn btn-sm btn-dark rounded-pill px-3">Tümü</a>
                             <a href="/events?type=Konser" class="btn btn-sm btn-light border rounded-pill px-3">Konser</a>
                             <a href="/events?type=Atölye" class="btn btn-sm btn-light border rounded-pill px-3">Atölye</a>
-                            <a href="/events?type=Spor" class="btn btn-sm btn-light border rounded-pill px-3">Spor</a>
                         </div>
                     </div>
                 </div>
@@ -75,22 +87,15 @@
                     <div class="card-body">
                         <div class="d-flex mb-2">
                              <div class="bg-light rounded text-center p-2 me-3" style="min-width: 60px;">
-                                <span class="d-block fw-bold text-danger h5 mb-0" th:text="${#temporals.format(event.date, 'dd')}">24</span>
-                                <small class="text-muted" th:text="${#temporals.format(event.date, 'MMM')}">MAY</small>
+                                <span class="d-block fw-bold text-danger h5 mb-0" th:text="${#temporals.format(event.date, 'dd')}"></span>
+                                <small class="text-muted" th:text="${#temporals.format(event.date, 'MMM')}"></small>
                             </div>
                             <div>
-                                <h5 class="fw-bold mb-1" th:text="${event.title}">Etkinlik Adı</h5>
-                                <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i> <span th:text="${event.location}">Konum</span></p>
+                                <h5 class="fw-bold mb-1" th:text="${event.title}"></h5>
+                                <p class="text-muted small mb-0"><i class="fas fa-map-marker-alt me-1"></i> <span th:text="${event.location}"></span></p>
                             </div>
                         </div>
-                        <p class="card-text text-muted small" th:text="${event.description}">Açıklama...</p>
-                         <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-2">
-                            <div class="d-flex align-items-center">
-                                <img th:src="${event.organizer.avatarPath}" class="rounded-circle me-2 border" width="25" height="25">
-                                <small class="text-muted fw-bold" th:text="${event.organizer.fullname}">Düzenleyen</small>
-                            </div>
-                            <small class="text-muted fw-bold" th:text="${#temporals.format(event.date, 'HH:mm')}">20:00</small>
-                        </div>
+                        <p class="card-text text-muted small" th:text="${event.description}"></p>
                     </div>
                 </div>
 
@@ -106,7 +111,6 @@
                         <h6 class="fw-bold text-muted mb-3">Yaklaşan Büyük Etkinlikler</h6>
                         <div class="d-flex flex-wrap">
                             <span class="badge bg-light text-dark border p-2 m-1">#BaharŞenliği</span>
-                            <span class="badge bg-light text-dark border p-2 m-1">#KariyerGünü</span>
                         </div>
                     </div>
                 </div>
@@ -122,7 +126,7 @@
         <a href="/profile" class="nav-item-mobile"><img th:src="${user.avatarPath}" class="rounded-circle border" width="24" height="24"><span class="d-block">Profil</span></a>
     </div>
 
-    <div class="modal fade" id="addEventModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 rounded-4"><div class="modal-header border-0"><h5 class="modal-title fw-bold">Etkinlik Oluştur</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><form action="/events/upload" method="post" enctype="multipart/form-data"><div class="modal-body"><input type="text" name="title" class="form-control mb-2 rounded-3" placeholder="Etkinlik Adı" required><input type="datetime-local" name="date" class="form-control mb-2 rounded-3" required><input type="text" name="location" class="form-control mb-2 rounded-3" placeholder="Konum" required><textarea name="description" class="form-control mb-2 rounded-3" placeholder="Açıklama"></textarea><input type="file" name="image" class="form-control rounded-3"></div><div class="modal-footer border-0"><button type="submit" class="btn btn-primary rounded-pill w-100">Oluştur</button></div></form></div></div></div>
+    <div class="modal fade" id="addEventModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0 rounded-4"><div class="modal-header border-0"><h5 class="modal-title fw-bold">Etkinlik Oluştur</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><form action="/events/upload" method="post" enctype="multipart/form-data"><div class="modal-body"><input type="text" name="title" class="form-control mb-2 rounded-3" placeholder="Adı" required><input type="datetime-local" name="date" class="form-control mb-2 rounded-3" required><input type="text" name="location" class="form-control mb-2 rounded-3" placeholder="Konum" required><textarea name="description" class="form-control mb-2 rounded-3"></textarea><input type="file" name="image" class="form-control rounded-3"></div><div class="modal-footer border-0"><button type="submit" class="btn btn-primary rounded-pill w-100">Oluştur</button></div></form></div></div></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

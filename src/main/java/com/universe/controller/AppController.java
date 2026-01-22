@@ -30,28 +30,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.universe.model.ChatGroup;
-import com.universe.model.ChatMessage;
-import com.universe.model.Comment;
-import com.universe.model.Event;
-import com.universe.model.LectureNote;
-import com.universe.model.Message;
-import com.universe.model.Notification;
-import com.universe.model.Post;
-import com.universe.model.Product;
-import com.universe.model.Story;
-import com.universe.model.User;
-import com.universe.repository.ChatGroupRepository;
-import com.universe.repository.ChatMessageRepository;
-import com.universe.repository.CommentRepository;
-import com.universe.repository.EventRepository;
-import com.universe.repository.MessageRepository;
-import com.universe.repository.NoteRepository;
-import com.universe.repository.NotificationRepository;
-import com.universe.repository.PostRepository;
-import com.universe.repository.ProductRepository;
-import com.universe.repository.StoryRepository;
-import com.universe.repository.UserRepository;
+import com.universe.model.*;
+import com.universe.repository.*;
 import com.universe.util.FileUploadUtil;
 
 import jakarta.servlet.http.HttpSession;
@@ -110,7 +90,6 @@ public class AppController {
             ChatGroup activeChat = chatGroupRepo.findById(groupId).orElse(null);
             if (activeChat != null && activeChat.getMembers().contains(user)) {
                 
-                // Okundu İşaretleme
                 List<ChatMessage> messages = activeChat.getMessages();
                 for (ChatMessage msg : messages) {
                     if (!msg.getSender().getId().equals(user.getId()) && !"Okundu".equals(msg.getStatus())) {
@@ -127,7 +106,6 @@ public class AppController {
                     model.addAttribute("chatAvatar", otherUser.getAvatarPath());
                     model.addAttribute("chatUserStatus", otherUser.getLastSeenText()); 
                     model.addAttribute("chatUserId", otherUser.getId());
-                    // Engelleme durumu kontrolü için
                     model.addAttribute("isBlocked", user.getBlockedUsers().contains(otherUser));
                 } else {
                     model.addAttribute("chatTitle", activeChat.getName());
@@ -149,10 +127,9 @@ public class AppController {
         ChatGroup group = chatGroupRepo.findById(groupId).orElse(null);
         if (group != null && group.getMembers().contains(user) && !content.trim().isEmpty()) {
             
-            // Eğer DM ise ve engelli ise mesaj atamasın
             if(group.isPrivate()) {
                 User other = group.getOtherUser(user);
-                if(other.getBlockedUsers().contains(user)) { // O beni engellediyse
+                if(other.getBlockedUsers().contains(user)) { 
                     return "redirect:/chat?groupId=" + groupId + "&error=blocked";
                 }
             }
@@ -174,7 +151,6 @@ public class AppController {
         return "redirect:/chat?groupId=" + groupId;
     }
 
-    // YENİ: Sohbeti Temizle
     @GetMapping("/chat/clear/{groupId}")
     public String clearChat(@PathVariable Long groupId, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -182,13 +158,11 @@ public class AppController {
         
         ChatGroup group = chatGroupRepo.findById(groupId).orElse(null);
         if (group != null && group.getMembers().contains(user)) {
-            // Şimdilik basitleştirilmiş: Gruptaki tüm mesajları siler
             chatMessageRepo.deleteAll(group.getMessages());
         }
         return "redirect:/chat?groupId=" + groupId;
     }
 
-    // YENİ: Kullanıcı Engelle / Kaldır
     @GetMapping("/user/block/{userId}")
     public String blockUser(@PathVariable Long userId, HttpSession session) {
         User me = (User) session.getAttribute("user");
@@ -198,16 +172,15 @@ public class AppController {
         User target = userRepo.findById(userId).orElse(null);
         if (target != null && !me.getId().equals(target.getId())) {
             if (me.getBlockedUsers().contains(target)) {
-                me.getBlockedUsers().remove(target); // Engeli Kaldır
+                me.getBlockedUsers().remove(target); 
             } else {
-                me.getBlockedUsers().add(target); // Engelle
-                me.getFollowing().remove(target); // Takipten de çıkar
-                target.getFollowing().remove(me); // O da beni takip edemesin
+                me.getBlockedUsers().add(target); 
+                me.getFollowing().remove(target); 
+                target.getFollowing().remove(me); 
             }
             userRepo.save(me);
             userRepo.save(target);
         }
-        // Eğer sohbetten geldiyse sohbete, profilden geldiyse profile dön
         return "redirect:/home"; 
     }
 
@@ -297,13 +270,62 @@ public class AppController {
         return "home";
     }
 
-    // --- HİKAYE VE DİĞERLERİ (AYNEN KORUNDU) ---
     @PostMapping("/story/upload") public String uploadStory(@RequestParam("image") MultipartFile multipartFile, HttpSession session) throws IOException { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; if (!multipartFile.isEmpty()) { Story story = new Story(); story.setUser(user); String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename()); story.setImageUrl(fileName); Story savedStory = storyRepo.save(story); String uploadDir = "uploads/stories/" + savedStory.getId(); FileUploadUtil.saveFile(uploadDir, fileName, multipartFile); } return "redirect:/home"; }
     @GetMapping("/story/view/{id}") @ResponseBody public String viewStory(@PathVariable Long id, HttpSession session) { User user = (User) session.getAttribute("user"); if (user == null) return "error"; user = userRepo.findById(user.getId()).orElse(user); Story story = storyRepo.findById(id).orElse(null); if (story != null && !story.getUser().getId().equals(user.getId())) { User dbUser = userRepo.findById(user.getId()).get(); if (!story.getViewers().contains(dbUser)) { story.getViewers().add(dbUser); storyRepo.save(story); } } return "ok"; }
     @GetMapping("/story/like/{id}") public String likeStory(@PathVariable Long id, HttpSession session) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; user = userRepo.findById(user.getId()).orElse(user); Story story = storyRepo.findById(id).orElse(null); if (story != null) { User dbUser = userRepo.findById(user.getId()).get(); if (story.getLikes().contains(dbUser)) story.getLikes().remove(dbUser); else story.getLikes().add(dbUser); storyRepo.save(story); } return "redirect:/home"; }
     @PostMapping("/post") public String createPost(@RequestParam(value = "content", required = false) String content, @RequestParam("image") MultipartFile multipartFile, @RequestParam(value = "category", defaultValue = "Genel") String category, @RequestParam(value = "isAnonymous", required = false) boolean isAnonymous, HttpSession session) throws IOException { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; if ((content == null || content.trim().isEmpty()) && multipartFile.isEmpty()) return "redirect:/home"; Post post = new Post(); post.setContent(content); post.setAuthorName(user.getFullname()); post.setCategory(category); post.setAnonymous(isAnonymous); if (!multipartFile.isEmpty()) { String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename()); post.setImageUrl(fileName); Post savedPost = postRepo.save(post); FileUploadUtil.saveFile("uploads/" + savedPost.getId(), fileName, multipartFile); } else { postRepo.save(post); } return "redirect:/home"; }
-    @GetMapping("/market") public String showMarket(HttpSession session, Model model, @RequestParam(required = false) String category) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; updateUserSession(session); model.addAttribute("user", user); model.addAttribute("unreadCount", notificationRepo.countByRecipientAndIsReadFalse(user)); List<Product> products; if (category != null && !category.isEmpty()) { products = productRepo.findByCategoryOrderByCreatedAtDesc(category); model.addAttribute("activeCategory", category); } else { products = productRepo.findAllByOrderByCreatedAtDesc(); } products.sort((p1, p2) -> { boolean v1 = p1.getSeller().isVip(); boolean v2 = p2.getSeller().isVip(); if (v1 && !v2) return -1; if (!v1 && v2) return 1; return 0; }); model.addAttribute("products", products); return "market"; }
-    @PostMapping("/market/create") public String createProduct(@ModelAttribute Product product, @RequestParam("image") MultipartFile multipartFile, HttpSession session) throws IOException { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; product.setSeller(user); if (!multipartFile.isEmpty()) { String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename()); product.setImageUrl(fileName); Product savedProduct = productRepo.save(product); String uploadDir = "uploads/products/" + savedProduct.getId(); FileUploadUtil.saveFile(uploadDir, fileName, multipartFile); } else { productRepo.save(product); } return "redirect:/market"; }
+    
+    // --- UNI-PAZAR İŞLEMLERİ (DÜZELTİLDİ) ---
+    @GetMapping("/market") 
+    public String showMarket(HttpSession session, Model model, @RequestParam(required = false) String category) { 
+        User user = (User) session.getAttribute("user"); 
+        if (user == null) return "redirect:/login"; 
+        updateUserSession(session); 
+        model.addAttribute("user", user); 
+        model.addAttribute("unreadCount", notificationRepo.countByRecipientAndIsReadFalse(user)); 
+        
+        List<Product> products; 
+        if (category != null && !category.isEmpty()) { 
+            products = productRepo.findByCategoryOrderByCreatedAtDesc(category); 
+            model.addAttribute("activeCategory", category); 
+        } else { 
+            products = productRepo.findAllByOrderByCreatedAtDesc(); 
+        } 
+        
+        // VIP satıcıları öne çıkar (Null check ile güvenli hale getirildi)
+        products.sort((p1, p2) -> { 
+            boolean v1 = p1.getSeller() != null && p1.getSeller().isVip(); 
+            boolean v2 = p2.getSeller() != null && p2.getSeller().isVip(); 
+            if (v1 && !v2) return -1; 
+            if (!v1 && v2) return 1; 
+            return 0; 
+        }); 
+        
+        model.addAttribute("products", products); 
+        return "market"; 
+    }
+    
+    // Ürün Ekleme (Contact Number ve diğerleri eklendi)
+    @PostMapping("/market/create")
+    public String createProduct(@ModelAttribute Product product, @RequestParam("image") MultipartFile multipartFile, HttpSession session) throws IOException {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return "redirect:/login";
+        
+        product.setSeller(user);
+        
+        if (!multipartFile.isEmpty()) {
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            product.setImageUrl(fileName);
+            Product savedProduct = productRepo.save(product);
+            String uploadDir = "uploads/products/" + savedProduct.getId();
+            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+        } else {
+            productRepo.save(product);
+        }
+        return "redirect:/market";
+    }
+
+    // --- DİĞERLERİ AYNEN DEVAM EDİYOR ---
     @PostMapping("/profile/update") public String updateProfile(@RequestParam("fullname") String fullname, @RequestParam("bio") String bio, @RequestParam("department") String department, @RequestParam("music") MultipartFile musicFile, @RequestParam("avatar") MultipartFile multipartFile, HttpSession session) throws IOException { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; User currentUser = userRepo.findById(user.getId()).orElse(null); if (currentUser != null) { currentUser.setFullname(fullname); currentUser.setBio(bio); currentUser.setDepartment(department); if (!multipartFile.isEmpty()) { String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename()); currentUser.setAvatar(fileName); String uploadDir = "uploads/users/" + currentUser.getId(); FileUploadUtil.saveFile(uploadDir, fileName, multipartFile); } if (!musicFile.isEmpty()) { String musicName = StringUtils.cleanPath(musicFile.getOriginalFilename()); currentUser.setProfileMusic(musicName); String uploadDir = "uploads/users/" + currentUser.getId(); FileUploadUtil.saveFile(uploadDir, musicName, musicFile); } userRepo.save(currentUser); session.setAttribute("user", currentUser); } return "redirect:/profile"; }
     @GetMapping("/post/save/{id}") public String savePost(@PathVariable Long id, HttpSession session) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; user = userRepo.findById(user.getId()).orElse(user); Post post = postRepo.findById(id).orElse(null); if (post != null) { if (user.getSavedPosts().contains(post)) { user.getSavedPosts().remove(post); } else { user.getSavedPosts().add(post); } userRepo.save(user); } return "redirect:/home"; }
     @GetMapping("/saved-posts") public String showSavedPosts(HttpSession session, Model model) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; updateUserSession(session); List<Post> savedPosts = new ArrayList<>(user.getSavedPosts()); PrettyTime p = new PrettyTime(new Locale("tr")); for(Post post : savedPosts) { Date date = Date.from(post.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()); post.setTimeAgo(p.format(date)); if (post.getLikes().contains(user)) post.setLikedByCurrentUser(true); User author = userRepo.findByFullname(post.getAuthorName()); if (author != null) { post.setAuthorId(author.getId()); post.setAuthorAvatar(author.getAvatarPath()); } else { post.setAuthorAvatar("/images/default-user.png"); } } model.addAttribute("savedPosts", savedPosts); model.addAttribute("user", user); model.addAttribute("unreadCount", notificationRepo.countByRecipientAndIsReadFalse(user)); return "saved-posts"; }

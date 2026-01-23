@@ -425,6 +425,25 @@ public class AppController {
     @PostMapping("/settings/toggle-ghost") public String toggleGhostMode(HttpSession session, Model model) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; User currentUser = userRepo.findById(user.getId()).orElse(null); if (currentUser != null && currentUser.isVip()) { currentUser.setGhostMode(!currentUser.isGhostMode()); userRepo.save(currentUser); } else { return "redirect:/settings?error=VIP"; } session.setAttribute("user", currentUser); return "redirect:/settings"; }
     @GetMapping("/logout") public String logout(HttpSession session) { session.invalidate(); return "redirect:/"; }
     @GetMapping("/events") public String showEvents(HttpSession session, Model model) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; updateUserSession(session); model.addAttribute("user", user); List<Event> events = eventRepo.findByDateGreaterThanEqualOrderByDateAscTimeAsc(LocalDate.now()); events.sort((e1, e2) -> { boolean v1 = e1.getOrganizer().isVip(); boolean v2 = e2.getOrganizer().isVip(); if (v1 && !v2) return -1; if (!v1 && v2) return 1; return 0; }); for (Event e : events) { if (e.getAttendees().contains(user)) { e.setAttending(true); } } model.addAttribute("events", events); return "events"; }
-    @PostMapping("/events/create") public String createEvent(@ModelAttribute Event event, @RequestParam("image") MultipartFile multipartFile, HttpSession session) throws IOException { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; event.setOrganizer(user); if (!multipartFile.isEmpty()) { String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename()); event.setImageUrl(fileName); Event savedEvent = eventRepo.save(event); String uploadDir = "uploads/events/" + savedEvent.getId(); FileUploadUtil.saveFile(uploadDir, fileName, multipartFile); } else { eventRepo.save(event); } return "redirect:/events"; }
+   // DÜZELTME: Adres "/events/upload" olarak değiştirildi (HTML ile uyumlu olsun diye)
+    @PostMapping("/events/upload") 
+    public String createEvent(@ModelAttribute Event event, @RequestParam("image") MultipartFile multipartFile, HttpSession session) throws IOException {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return "redirect:/login";
+        
+        event.setOrganizer(user);
+        
+        if (!multipartFile.isEmpty()) {
+            String fileName = org.springframework.util.StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            event.setImageUrl(fileName);
+            
+            Event savedEvent = eventRepo.save(event);
+            String uploadDir = "uploads/events/" + savedEvent.getId();
+            com.universe.util.FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+        } else {
+            eventRepo.save(event);
+        }
+        return "redirect:/events";
+    }
     @GetMapping("/events/join/{id}") public String joinEvent(@PathVariable Long id, HttpSession session) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; Event event = eventRepo.findById(id).orElse(null); User currentUser = userRepo.findById(user.getId()).orElse(null); if (event != null && currentUser != null) { if (event.getAttendees().contains(currentUser)) { event.getAttendees().remove(currentUser); } else { event.getAttendees().add(currentUser); } eventRepo.save(event); } return "redirect:/events"; }
 }

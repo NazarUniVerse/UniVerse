@@ -30,8 +30,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.universe.model.*;
-import com.universe.repository.*;
+import com.universe.model.ChatGroup;
+import com.universe.model.ChatMessage;
+import com.universe.model.Comment;
+import com.universe.model.Event;
+import com.universe.model.LectureNote;
+import com.universe.model.Message;
+import com.universe.model.Notification;
+import com.universe.model.Post;
+import com.universe.model.Product;
+import com.universe.model.Story;
+import com.universe.model.User;
+import com.universe.repository.ChatGroupRepository;
+import com.universe.repository.ChatMessageRepository;
+import com.universe.repository.CommentRepository;
+import com.universe.repository.EventRepository;
+import com.universe.repository.MessageRepository;
+import com.universe.repository.NoteRepository;
+import com.universe.repository.NotificationRepository;
+import com.universe.repository.PostRepository;
+import com.universe.repository.ProductRepository;
+import com.universe.repository.StoryRepository;
+import com.universe.repository.UserRepository;
 import com.universe.util.FileUploadUtil;
 
 import jakarta.servlet.http.HttpSession;
@@ -334,8 +354,61 @@ public class AppController {
     @PostMapping("/register") public String registerUser(User user, Model model) { String email = user.getEmail(); if (email == null || (!email.endsWith(".edu.tr") && !email.endsWith(".edu"))) { model.addAttribute("error", "Üzgünüz! Sadece üniversite e-postası ile kayıt olabilirsiniz."); return "register"; } User existingUser = userRepo.findByEmail(email); if (existingUser != null) { model.addAttribute("error", "Bu e-posta adresi zaten sisteme kayıtlı!"); return "register"; } user.setVerified(false); userRepo.save(user); return "redirect:/login"; }
     @GetMapping("/login") public String showLogin() { return "login"; }
     @PostMapping("/login") public String loginUser(@RequestParam String email, @RequestParam String password, HttpSession session, Model model) { User user = userRepo.findByEmail(email); if (user != null && user.getPassword().equals(password)) { session.setAttribute("user", user); return "redirect:/home"; } model.addAttribute("error", "Hatalı email veya şifre!"); return "login"; }
-    @GetMapping("/notes") public String showNotes(HttpSession session, Model model, @RequestParam(required = false) String dept) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; updateUserSession(session); model.addAttribute("user", user); model.addAttribute("unreadCount", notificationRepo.countByRecipientAndIsReadFalse(user)); List<LectureNote> notes; if (dept != null && !dept.isEmpty()) { notes = noteRepo.findByDepartmentOrderByCreatedAtDesc(dept); model.addAttribute("activeDept", dept); } else { notes = noteRepo.findAllByOrderByCreatedAtDesc(); } model.addAttribute("notes", notes); return "notes"; }
-    @PostMapping("/notes/upload") public String uploadNote(@RequestParam("title") String title, @RequestParam("description") String description, @RequestParam("department") String department, @RequestParam("file") MultipartFile file, HttpSession session) throws IOException { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; if (!file.isEmpty()) { LectureNote note = new LectureNote(); note.setTitle(title); note.setDescription(description); note.setDepartment(department); note.setUploader(user); String fileName = StringUtils.cleanPath(file.getOriginalFilename()); note.setFileName(fileName); LectureNote savedNote = noteRepo.save(note); String uploadDir = "uploads/notes/" + savedNote.getId(); FileUploadUtil.saveFile(uploadDir, fileName, file); } return "redirect:/notes"; }
+@GetMapping("/notes") 
+    public String showNotes(HttpSession session, Model model, @RequestParam(required = false) String dept, @RequestParam(required = false) String type) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return "redirect:/login";
+        updateUserSession(session);
+        model.addAttribute("user", user);
+        model.addAttribute("unreadCount", notificationRepo.countByRecipientAndIsReadFalse(user));
+        
+        List<LectureNote> notes;
+        
+        if (type != null && !type.isEmpty()) {
+            // Tipe göre getir (Ders Notu vb.)
+            notes = noteRepo.findByTypeOrderByCreatedAtDesc(type);
+        } else if (dept != null && !dept.isEmpty()) {
+            // Bölüme göre getir
+            notes = noteRepo.findByDepartmentOrderByCreatedAtDesc(dept);
+            model.addAttribute("activeDept", dept);
+        } else {
+            // Hepsini getir
+            notes = noteRepo.findAllByOrderByCreatedAtDesc();
+        }
+        
+        model.addAttribute("notes", notes);
+        return "notes";
+    }
+   @PostMapping("/notes/upload") 
+    public String uploadNote(
+            @RequestParam("title") String title, 
+            @RequestParam("description") String description, 
+            @RequestParam("department") String department, 
+            // YENİ: Type parametresi eklendi
+            @RequestParam("type") String type,
+            @RequestParam("file") MultipartFile file, 
+            HttpSession session) throws IOException {
+        
+        User user = (User) session.getAttribute("user");
+        if (user == null) return "redirect:/login";
+        
+        if (!file.isEmpty()) {
+            LectureNote note = new LectureNote();
+            note.setTitle(title);
+            note.setDescription(description);
+            note.setDepartment(department); // Varsayılan bölüm yoksa genel
+            note.setType(type); // Tipi kaydet!
+            note.setUploader(user);
+            
+            String fileName = org.springframework.util.StringUtils.cleanPath(file.getOriginalFilename());
+            note.setFileName(fileName);
+            
+            LectureNote savedNote = noteRepo.save(note);
+            String uploadDir = "uploads/notes/" + savedNote.getId();
+            com.universe.util.FileUploadUtil.saveFile(uploadDir, fileName, file);
+        }
+        return "redirect:/notes";
+    }
     @GetMapping("/notes/download/{id}") public ResponseEntity<Resource> downloadNote(@PathVariable Long id) { LectureNote note = noteRepo.findById(id).orElse(null); if (note == null) return ResponseEntity.notFound().build(); Path filePath = Paths.get("uploads/notes/" + note.getId() + "/" + note.getFileName()); Resource resource; try { resource = new UrlResource(filePath.toUri()); if(resource.exists() || resource.isReadable()) { return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + note.getFileName() + "\"").contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource); } } catch (MalformedURLException e) { e.printStackTrace(); } return ResponseEntity.notFound().build(); }
     @GetMapping("/notifications") public String showNotifications(HttpSession session, Model model) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; List<Notification> notifications = notificationRepo.findByRecipientOrderByCreatedAtDesc(user); PrettyTime p = new PrettyTime(new Locale("tr")); for (Notification n : notifications) { Date date = Date.from(n.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant()); n.setTimeAgo(p.format(date)); if (!n.isRead()) { n.setRead(true); notificationRepo.save(n); } } model.addAttribute("notifications", notifications); model.addAttribute("user", user); return "notifications"; }
     @GetMapping("/post/like/{id}") public String likePost(@PathVariable Long id, HttpSession session) { User user = (User) session.getAttribute("user"); if (user == null) return "redirect:/login"; Post post = postRepo.findById(id).orElse(null); User currentUser = userRepo.findById(user.getId()).orElse(null); if (post != null && currentUser != null) { if (post.getLikes().contains(currentUser)) { post.getLikes().remove(currentUser); } else { post.getLikes().add(currentUser); User postOwner = userRepo.findByFullname(post.getAuthorName()); if (postOwner != null) createNotification(postOwner, currentUser, "LIKE", "gönderini beğendi.", post, null); } postRepo.save(post); } return "redirect:/home"; }

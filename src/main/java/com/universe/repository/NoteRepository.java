@@ -7,7 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.universe.model.LectureNote;
 
 public interface NoteRepository extends JpaRepository<LectureNote, Long> {
+    
+    // Tarihe göre sıralı getir
     List<LectureNote> findAllByOrderByCreatedAtDesc();
+    
+    // Bölüme göre filtrele
     List<LectureNote> findByDepartmentOrderByCreatedAtDesc(String department);
-    List<LectureNote> findByTitleContainingIgnoreCase(String keyword);
+    
+    // YENİ: Tipe göre filtrele (Ders Notu / Çıkmış Sorular)
+    List<LectureNote> findByTypeOrderByCreatedAtDesc(String type);
 }

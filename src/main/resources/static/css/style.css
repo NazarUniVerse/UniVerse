@@ -1,126 +1,36 @@
-/* --- TEMEL AYARLAR --- */
-* { box-sizing: border-box; }
+/* --- MASKOT (Login/Register) STİLLERİ --- */
 
-/* --- RENK PALETİ --- */
-:root {
-    --primary-color: #6366f1;       /* Ana Mor */
-    --secondary-color: #ec4899;     /* Ana Pembe */
-    --bg-color: #f3f4f6;            /* Açık Arkaplan */
-    --text-color: #212529;          /* Koyu Yazı */
-    --text-muted: #6c757d;          /* Gri Yazı */
-    --card-bg: #ffffff;             /* Beyaz Kart */
-    --border-color: #dee2e6;        /* Gri Kenarlık */
-    --nav-bg: rgba(255, 255, 255, 0.95);
-    --input-bg: #f8f9fa;            /* Hafif Gri Input */
-    --hover-bg: rgba(99, 102, 241, 0.05);
+.auth-wrapper {
+    position: relative;
+    max-width: 420px;
+    width: 100%;
+    margin: 110px auto 50px auto; /* Panda için üstten boşluk */
 }
 
-/* --- KARANLIK MOD --- */
-[data-theme="dark"] {
-    --primary-color: #a5b4fc;
-    --secondary-color: #f472b6;
-    --bg-color: #0f172a;
-    --text-color: #f1f5f9;
-    --text-muted: #94a3b8;
-    --card-bg: #1e293b;
-    --border-color: #334155;
-    --nav-bg: rgba(15, 23, 42, 0.95);
-    --input-bg: #0f172a;
-    --hover-bg: rgba(255, 255, 255, 0.1);
+/* Panda Resmi */
+.mascot-img {
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    top: -95px; /* Kartın tam tepesine oturt */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    pointer-events: none; /* Tıklamayı engelleme */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Yumuşak geçiş */
 }
 
-/* --- GOLDEN MOD --- */
-[data-theme="gold"] {
-    --primary-color: #ffd700;
-    --bg-color: #000000;
-    --text-color: #ffed4a;
-    --text-muted: #e2e8f0;
-    --card-bg: #111111;
-    --border-color: #ffd700;
-    --nav-bg: #000000;
-    --input-bg: #222222;
+/* Efekt Sınıfları */
+.mascot-look {
+    transform: translateX(-50%) translateY(8px) scale(1.05); /* Aşağı bakış */
+}
+.mascot-hide {
+    transform: translateX(-50%) scale(0.95); /* Göz kapatma */
 }
 
-/* --- GENEL --- */
-body {
-    background-color: var(--bg-color) !important;
-    color: var(--text-color) !important;
-    transition: all 0.3s ease;
-    font-family: 'Segoe UI', sans-serif;
+/* Kartın üstü panda ile çakışmasın */
+.auth-card {
+    position: relative;
+    z-index: 5;
+    padding-top: 25px;
 }
-
-/* --- KART TASARIMI --- */
-.glass-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 20px; /* Kart köşeleri daha yumuşak */
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); /* Daha modern gölge */
-}
-[data-theme="dark"] .glass-card { box-shadow: none; }
-
-/* --- NAVBAR --- */
-.navbar-modern {
-    background-color: var(--nav-bg) !important;
-    border-bottom: 1px solid var(--border-color);
-}
-.brand-logo {
-    font-weight: bold;
-    font-size: 1.5rem;
-    background: -webkit-linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* --- KRİTİK DÜZELTME: INPUTLAR YUVARLAK OLSUN --- */
-.form-control, .form-select, .input-group-text {
-    background-color: var(--input-bg) !important;
-    border-color: var(--border-color) !important;
-    color: var(--text-color) !important;
-    border-radius: 50px !important; /* TAM YUVARLAK (Pill Shape) */
-    padding: 12px 20px; /* İç boşluk artırıldı */
-}
-.form-control:focus, .form-select:focus {
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15); /* Focus efekti */
-    border-color: var(--primary-color) !important;
-}
-textarea.form-control {
-    border-radius: 20px !important; /* Textarea tam yuvarlak olamaz, köşeli olsun */
-}
-
-/* --- BUTONLAR --- */
-.btn-primary-modern {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border: none;
-    color: #fff !important;
-    border-radius: 50px; /* Butonlar da yuvarlak */
-    padding: 10px 25px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-.btn-primary-modern:hover { opacity: 0.9; transform: translateY(-1px); }
-
-/* --- DİĞER DÜZELTMELER --- */
-.settings-item {
-    cursor: pointer; padding: 15px; border-bottom: 1px solid var(--border-color);
-    color: var(--text-color); transition: all 0.2s;
-}
-.settings-item:hover { background-color: var(--hover-bg); padding-left: 20px; }
-
-h1, h2, h3, h4, h5, h6, p, span, div, label, li, small { color: var(--text-color); }
-.text-muted { color: var(--text-muted) !important; }
-.text-primary { color: var(--primary-color) !important; }
-
-.navbar-nav .nav-link { color: var(--text-color) !important; opacity: 0.8; }
-.navbar-nav .nav-link.active, .navbar-nav .nav-link:hover { color: var(--primary-color) !important; opacity: 1; }
-
-.dropdown-menu { background-color: var(--card-bg) !important; border-color: var(--border-color) !important; border-radius: 15px; }
-.dropdown-item { color: var(--text-color) !important; border-radius: 10px; margin: 2px 5px; width: auto;}
-.dropdown-item:hover { background-color: var(--hover-bg) !important; }
-
-[data-theme="dark"] .bg-light, [data-theme="gold"] .bg-light { background-color: var(--input-bg) !important; color: var(--text-color) !important; border-color: var(--border-color) !important; }
-[data-theme="dark"] .bg-white, [data-theme="gold"] .bg-white { background-color: var(--card-bg) !important; color: var(--text-color) !important; }
-[data-theme="dark"] .text-dark, [data-theme="gold"] .text-dark { color: var(--text-color) !important; }
-
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
